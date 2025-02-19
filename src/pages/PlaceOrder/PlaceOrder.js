@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import './PlaceOrder.css';
 import axios from 'axios';
 import { StoreContext } from '../../context/StoreContext';
+import {jwtDecode} from "jwt-decode";
 
 const PlaceOrder = () => {
   const [data, setData] = useState({
@@ -19,16 +20,20 @@ const PlaceOrder = () => {
   const { getTotalCartAmount, food_list, cartItems, url,token } = useContext(StoreContext);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
+    if (!window.Razorpay) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => console.log("Razorpay script loaded");
+      script.onerror = () => console.error("Failed to load Razorpay script");
+      document.body.appendChild(script);
+    }
+  }, []);  
 
   const getUserIdFromToken = (token) => {
     try {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT
-      return payload?.id; // Adjust this based on your token structure
+      const decoded = jwtDecode(token);
+      return decoded?.id;
     } catch (error) {
       console.error("Invalid token", error);
       return null;
@@ -75,12 +80,17 @@ const PlaceOrder = () => {
   
       if (response.data.success) {
         const { order_id, key, amount, userId } = response.data;
+
+        if (!window.Razorpay) {
+          alert("Payment gateway is not available. Please refresh the page.");
+          return;
+        }
   
         const options = {
-          key, // Razorpay API key
-          amount, // Amount already in paise
+          key, 
+          amount, 
           currency: "INR",
-          name: "Your Company Name",
+          name: "pragnesh",
           description: "Order Payment",
           order_id, // Pass Razorpay order ID
           handler: function (paymentResponse) {
