@@ -1,10 +1,14 @@
-.header{
+.header {
   height: 34vw;
   margin: 30px auto;
-  background:url('../../assets/frontend_assets/header_img.png') no-repeat;
-  background-size: contain;
+  background: url('../../assets/frontend_assets/h1.jpg') no-repeat center center;
+  background-size: cover;
   position: relative;
+  width: 100%;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5); /* Darker shadow */
+  border-radius: 10px; /* Optional for rounded corners */
 }
+
 
 .header-contents{
   position: absolute;

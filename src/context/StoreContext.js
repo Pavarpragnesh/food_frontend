@@ -4,10 +4,22 @@ import React, { createContext, useEffect, useState } from "react";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
+  const [categories, setCategories] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const url = "http://localhost:5001"
   const [token,setToken] = useState("");
   const [food_list,setFoodList] = useState([]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${url}/api/category/list`);
+      if (response.data.success) {
+        setCategories(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
   
   const addToCard = async (itemId) => {
     if (!cartItems[itemId]) {
@@ -75,18 +87,29 @@ const StoreContextProvider = (props) => {
     }
   };
 
-  useEffect(()=>{
-    async function loadData() {
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchCategories();
       await fetchFoodList();
-      if(localStorage.getItem("token")) {
-        setToken(localStorage.getItem("token"));
-        await loadCartData(localStorage.getItem("token"));
+      const savedToken = localStorage.getItem("token");
+      if (savedToken) {
+        setToken(savedToken);
       }
-    }
+    };
     loadData();
-  },[]);
+  }, []);
+  
+  // Watch for token changes and load cart data
+  useEffect(() => {
+    if (token) {
+      loadCartData(token);
+    } else {
+      setCartItems({}); // Clear cart when token is removed (logout)
+    }
+  }, [token]);
   
   const contextValue = {
+    categories,
     food_list,
     cartItems,
     setCartItems,
