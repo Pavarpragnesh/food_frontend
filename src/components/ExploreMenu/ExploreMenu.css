@@ -32,6 +32,7 @@
   width: 100px; /* Fixed size for consistency */
   height: 100px;
   object-fit: cover;
+  cursor: pointer;
   border-radius: 50%;
   transition: 0.3s ease-in-out;
   border: 3px solid transparent; /* Default border to prevent layout shifts */

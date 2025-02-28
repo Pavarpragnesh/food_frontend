@@ -3,6 +3,7 @@ import './PlaceOrder.css';
 import axios from 'axios';
 import { StoreContext } from '../../context/StoreContext';
 import {jwtDecode} from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 
 const PlaceOrder = () => {
   const [data, setData] = useState({
@@ -95,8 +96,8 @@ const PlaceOrder = () => {
           order_id, // Pass Razorpay order ID
           handler: function (paymentResponse) {
             alert("Payment successful! Payment ID: " + paymentResponse.razorpay_payment_id);
-            window.location.href = `/order-success?userId=${userId}`; // Redirect with user ID
-          },
+            window.location.href = `/verify?success=true&orderId=${paymentResponse.razorpay_order_id}`;
+          },          
           prefill: {
             name: `${data.firstName} ${data.lastName}`,
             email: data.email,
@@ -105,9 +106,22 @@ const PlaceOrder = () => {
           theme: {
             color: "#3399cc",
           },
+          modal: {
+            ondismiss: function () {
+              alert("Payment was canceled.");
+            },
+          },
         };
   
         const rzp = new window.Razorpay(options);
+
+        rzp.on("payment.failed", function (response) {
+          alert(
+            `Payment failed!\nReason: ${response.error.description}\nPayment ID: ${response.error.metadata.payment_id}`
+          );
+          window.location.href = `/verify?success=false&orderId=${response.error.metadata.order_id}`;
+        });
+        
         rzp.open();
       } else {
         alert("Payment failed");
@@ -118,6 +132,17 @@ const PlaceOrder = () => {
     }
   };
   
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if(!token){
+      navigate('/cart');
+    }
+    else if(getTotalCartAmount()===0)
+    {
+      navigate('/cart');
+    }
+  },[token]);
   
   
   return (
