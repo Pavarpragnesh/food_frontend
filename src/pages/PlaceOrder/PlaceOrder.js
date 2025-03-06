@@ -80,8 +80,9 @@ const PlaceOrder = () => {
       });
   
       if (response.data.success) {
-        const { order_id, key, amount, userId } = response.data;
-
+        const { success_url,cancel_url, key, amount, userId } = response.data;
+        console.log(response);
+        
         if (!window.Razorpay) {
           alert("Payment gateway is not available. Please refresh the page.");
           return;
@@ -93,10 +94,9 @@ const PlaceOrder = () => {
           currency: "INR",
           name: "pragnesh",
           description: "Order Payment",
-          order_id, // Pass Razorpay order ID
           handler: function (paymentResponse) {
             alert("Payment successful! Payment ID: " + paymentResponse.razorpay_payment_id);
-            window.location.href = `/verify?success=true&orderId=${paymentResponse.razorpay_order_id}`;
+            window.location.href = success_url;
           },          
           prefill: {
             name: `${data.firstName} ${data.lastName}`,
@@ -119,7 +119,7 @@ const PlaceOrder = () => {
           alert(
             `Payment failed!\nReason: ${response.error.description}\nPayment ID: ${response.error.metadata.payment_id}`
           );
-          window.location.href = `/verify?success=false&orderId=${response.error.metadata.order_id}`;
+          window.location.href = cancel_url;
         });
         
         rzp.open();
