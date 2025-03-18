@@ -21,12 +21,12 @@ const StoreContextProvider = (props) => {
     }
   };
   
-  const addToCard = async (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    }
+  const addToCart = async (itemId) => {
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: (prev[itemId] || 0) + 1,
+    }));
+
     if (token) {
       try {
         await axios.post(
@@ -40,14 +40,22 @@ const StoreContextProvider = (props) => {
     }
   };
   
-
-  const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+  const removeFromCart = async (itemId, removeAll = false) => {
+    setCartItems((prev) => {
+      const updatedCart = { ...prev };
+      if (removeAll || updatedCart[itemId] === 1) {
+        delete updatedCart[itemId]; // Remove item completely if `removeAll` is true or quantity is 1
+      } else {
+        updatedCart[itemId] -= 1;
+      }
+      return updatedCart;
+    });
+  
     if (token) {
       try {
         await axios.post(
           `${url}/api/cart/remove`,
-          { itemId },
+          { itemId, removeAll },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } catch (error) {
@@ -55,6 +63,7 @@ const StoreContextProvider = (props) => {
       }
     }
   };
+  
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
@@ -113,7 +122,7 @@ const StoreContextProvider = (props) => {
     food_list,
     cartItems,
     setCartItems,
-    addToCard,
+    addToCart,
     removeFromCart,
     getTotalCartAmount,
     url,
