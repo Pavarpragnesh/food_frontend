@@ -7,6 +7,18 @@ const Cart = () => {
   const { cartItems, food_list, removeFromCart, addToCart, getTotalCartAmount, url } = useContext(StoreContext);
   const navigate = useNavigate();
 
+  // Calculate delivery fee based on subtotal
+  const subtotal = getTotalCartAmount();
+  const calculateDeliveryFee = (subtotal) => {
+    if (subtotal === 0 || subtotal < 100) return 0; // No delivery fee if cart is empty or below minimum
+    if (subtotal >= 100 && subtotal < 300) return 50;
+    if (subtotal >= 300 && subtotal <= 500) return 70;
+    if (subtotal > 500) return 0;
+    return 0; // Default case
+  };
+  const deliveryFee = calculateDeliveryFee(subtotal);
+  const isOrderBelowMinimum = subtotal > 0 && subtotal < 100;
+
   return (
     <div className="cart">
       <div className="cart-items">
@@ -27,13 +39,13 @@ const Cart = () => {
                 <div className="cart-items-title cart-items-item">
                   <img src={`${url}/images/${item.image}`} alt={item.name} />
                   <p>{item.name}</p>
-                  <p>${item?.price}</p>
+                  <p>₹{item?.price}</p>
                   <div className="quantity-controls">
                     <button onClick={() => removeFromCart(item._id)}>-</button>
                     <span>{cartItems[item._id]}</span>
                     <button onClick={() => addToCart(item._id)}>+</button>
                   </div>
-                  <p>${item?.price * cartItems[item?._id]}</p>
+                  <p>₹{item?.price * cartItems[item?._id]}</p>
                   <p onClick={() => removeFromCart(item._id, true)} className="cross">X</p>
                 </div>
                 <hr />
@@ -49,20 +61,28 @@ const Cart = () => {
           <div>
             <div className="cart-total-details">
               <p>Subtotal</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>₹{subtotal}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-              <p>${getTotalCartAmount() === 0 ? 0 : 2}</p>
+              <p>₹{deliveryFee}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
+              <b>₹{subtotal + deliveryFee}</b>
             </div>
           </div>
-          <button onClick={() => navigate('/order')}>PROCEED TO CHECKOUT</button>
+          {isOrderBelowMinimum && (
+            <p style={{ color: "red" }}>Minimum order amount is ₹100</p>
+          )}
+          <button
+            onClick={() => navigate('/order')}
+            disabled={isOrderBelowMinimum}
+          >
+            PROCEED TO CHECKOUT
+          </button>
         </div>
         <div className="cart-promocode">
           <p>If you have a promo code, enter it here</p>
