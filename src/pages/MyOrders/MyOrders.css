@@ -35,6 +35,34 @@
   cursor: pointer;
   color: #454545;
 }
+
+.my-orders-order p b {
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: normal;
+}
+
+/* Status colors */
+.status-delivered {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-out-for-delivery {
+  background-color: #ffc107;
+  color: black;
+}
+
+.status-processing {
+  background-color: #ff6347;
+  color: white;
+}
+
+.status-default {
+  background-color: grey;
+  color: white;
+}
+
 @media (max-width:900px) {
   .my-orders-order{
       grid-template-columns: 1fr 2fr 1fr;
