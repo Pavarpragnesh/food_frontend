@@ -3,17 +3,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed; /* Make the navbar fixed */
-  top: 0; /* Stick it to the top */
-  left: 0; /* Align it to the left edge */
-  width: 100%; /* Ensure it spans the full width */
-  background-color: white; /* Add a background to prevent transparency */
-  z-index: 1000; /* Ensure it stays above other content */
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  background-color: white; 
+  z-index: 1000; 
 }
 
-/* Add padding to body to prevent content from being hidden under the fixed navbar */
+
 body {
-  padding-top: 80px; /* Adjust this value based on your navbar height */
+  padding-top: 80px; 
 }
 
 .navbar .logo{
@@ -70,6 +70,66 @@ body {
   border-radius: 5px;
   top:-8px;
   right:-8px;
+}
+
+/* Profile and Dropdown Styling */
+.navbar-profile {
+  position: relative;
+  cursor: pointer;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid tomato;
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Added shadow transition */
+  cursor: pointer; /* Indicates clickability */
+}
+.user-photo:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(255, 99, 71, 0.5); /* Subtle glow effect */
+}
+
+.nav-profile-dropdown {
+  position: absolute;
+  
+}
+
+.navbar-profile:hover .nav-profile-dropdown {
+  display: flex;
+  display: none;
+  right: 0;
+  top: 40px;
+  z-index: 1;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #fff2ef;
+  padding: 12px 25px;
+  border-radius: 4px;
+  border: 1px solid tomato;
+  outline: 2px solid white;
+  list-style: none;
+}
+
+.nav-profile-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.nav-profile-dropdown img {
+  width: 20px;
+}
+
+.nav-profile-dropdown li:hover {
+  color: tomato;
 }
 
 @media (max-width:1050px) {

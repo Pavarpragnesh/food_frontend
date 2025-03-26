@@ -6,9 +6,11 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
   const [categories, setCategories] = useState([]);
   const [cartItems, setCartItems] = useState({});
-  const url = "http://localhost:5001"
-  const [token,setToken] = useState("");
-  const [food_list,setFoodList] = useState([]);
+  const url = "http://localhost:5001";
+  const [token, setToken] = useState("");
+  const [food_list, setFoodList] = useState([]);
+  const [user, setUser] = useState(null);
+  
 
   const fetchCategories = async () => {
     try {
@@ -20,7 +22,7 @@ const StoreContextProvider = (props) => {
       console.error("Error fetching categories:", error);
     }
   };
-  
+
   const addToCart = async (itemId) => {
     setCartItems((prev) => ({
       ...prev,
@@ -39,18 +41,18 @@ const StoreContextProvider = (props) => {
       }
     }
   };
-  
+
   const removeFromCart = async (itemId, removeAll = false) => {
     setCartItems((prev) => {
       const updatedCart = { ...prev };
       if (removeAll || updatedCart[itemId] === 1) {
-        delete updatedCart[itemId]; // Remove item completely if `removeAll` is true or quantity is 1
+        delete updatedCart[itemId];
       } else {
         updatedCart[itemId] -= 1;
       }
       return updatedCart;
     });
-  
+
     if (token) {
       try {
         await axios.post(
@@ -63,7 +65,6 @@ const StoreContextProvider = (props) => {
       }
     }
   };
-  
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
@@ -79,16 +80,20 @@ const StoreContextProvider = (props) => {
   };
 
   const fetchFoodList = async () => {
-    const response = await axios.get(url+"/api/food/list1");
-    setFoodList(response.data.data);
-  }
+    try {
+      const response = await axios.get(`${url}/api/food/list1`);
+      setFoodList(response.data.data);
+    } catch (error) {
+      console.error("Error fetching food list:", error);
+    }
+  };
 
-  const loadCartData = async (Token) => {
+  const loadCartData = async (token) => {
     try {
       const response = await axios.post(
         `${url}/api/cart/get`,
         {},
-        { headers: { Authorization: `Bearer ${Token}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setCartItems(response.data.cartData || {});
     } catch (error) {
@@ -103,20 +108,23 @@ const StoreContextProvider = (props) => {
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
         setToken(savedToken);
+        // Optionally fetch user details here if login doesn't provide them
       }
     };
     loadData();
   }, []);
-  
-  // Watch for token changes and load cart data
+
   useEffect(() => {
     if (token) {
       loadCartData(token);
     } else {
-      setCartItems({}); // Clear cart when token is removed (logout)
+      setCartItems({});
+      setUser(null); // Clear user data on logout
     }
   }, [token]);
+
   
+
   const contextValue = {
     categories,
     food_list,
@@ -127,7 +135,9 @@ const StoreContextProvider = (props) => {
     getTotalCartAmount,
     url,
     token,
-    setToken
+    setToken,
+    user,
+    setUser, 
   };
 
   return (
