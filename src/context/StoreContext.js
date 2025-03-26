@@ -82,7 +82,12 @@ const StoreContextProvider = (props) => {
   const fetchFoodList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list1`);
-      setFoodList(response.data.data);
+      console.log("Fetched food list:", response.data.data); // Debug log
+      if (response.data.success) {
+        setFoodList(response.data.data);
+      } else {
+        console.error("Failed to fetch food list:", response.data.message);
+      }
     } catch (error) {
       console.error("Error fetching food list:", error);
     }
