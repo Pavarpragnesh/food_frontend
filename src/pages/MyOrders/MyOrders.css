@@ -158,6 +158,14 @@
   cursor: not-allowed;
 }
 
+/* Add this to MyOrders.css */
+.already-rated {
+  text-align: center;
+  color: #666;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
 @media (max-width: 900px) {
   .my-orders-order {
     grid-template-columns: 1fr 2fr 1fr;

@@ -85,11 +85,11 @@ const Cart = () => {
           </button>
         </div>
         <div className="cart-promocode">
-          <p>If you have a promo code, enter it here</p>
+          {/* <p>If you have a promo code, enter it here</p>
           <div className="cart-promocode-input">
             <input type="text" placeholder="Promo code" />
             <button>Submit</button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
