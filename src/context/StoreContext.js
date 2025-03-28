@@ -10,7 +10,7 @@ const StoreContextProvider = (props) => {
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
   const [user, setUser] = useState(null);
-  
+  const [topDishes, setTopDishes] = useState([]); // New state for top dishes
 
   const fetchCategories = async () => {
     try {
@@ -56,7 +56,7 @@ const StoreContextProvider = (props) => {
     if (token) {
       try {
         await axios.post(
-          `${url}/api/cart/remove`,
+          `${url}/api.cart/remove`,
           { itemId, removeAll },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -93,6 +93,30 @@ const StoreContextProvider = (props) => {
     }
   };
 
+  const fetchTopDishes = async () => {
+    try {
+      const response = await axios.get(`${url}/api/order/top-ordered-dishes`);
+      if (response.data.success) {
+        // Enrich top dishes with additional details from food_list
+        const enrichedDishes = response.data.data.map((dish) => {
+          const foodItem = food_list.find((food) => food._id === dish._id);
+          return {
+            ...dish,
+            price: foodItem?.price || dish.price || 0,
+            image: foodItem?.image || dish.image || "",
+            description: foodItem?.description || dish.description || "Popular dish!",
+            averageRating: foodItem?.averageRating || 0,
+          };
+        });
+        setTopDishes(enrichedDishes);
+      } else {
+        console.error("Failed to fetch top dishes:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching top dishes:", error);
+    }
+  };
+
   const loadCartData = async (token) => {
     try {
       const response = await axios.post(
@@ -113,7 +137,6 @@ const StoreContextProvider = (props) => {
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
         setToken(savedToken);
-        // Optionally fetch user details here if login doesn't provide them
       }
     };
     loadData();
@@ -128,7 +151,10 @@ const StoreContextProvider = (props) => {
     }
   }, [token]);
 
-  
+  // Fetch top dishes whenever food_list changes (to ensure we have the latest data to enrich top dishes)
+  useEffect(() => {
+    fetchTopDishes();
+  }, [food_list]);
 
   const contextValue = {
     categories,
@@ -142,7 +168,8 @@ const StoreContextProvider = (props) => {
     token,
     setToken,
     user,
-    setUser, 
+    setUser,
+    topDishes, // Add topDishes to context
   };
 
   return (
