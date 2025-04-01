@@ -1,0 +1,81 @@
+.db-terms-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 40px;
+  font-family: 'Arial', sans-serif;
+  line-height: 1.8;
+  color: #333;
+  background-image: url('../../assets/frontend_assets//terms.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white overlay */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-height: 60vh;
+}
+
+.db-terms-container h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: tomato; /* Green color to match the example */
+  text-align: center;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 2px solid tomato;
+  padding-bottom: 10px;
+}
+
+.terms-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.7); /* Slightly more opaque white for contrast */
+  border-radius: 8px;
+  border-left: 4px solid tomato; /* Green accent on the left */
+}
+
+.terms-section h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.terms-item {
+  margin-bottom: 15px;
+}
+
+.terms-item p {
+  font-size: 16px;
+  margin: 0;
+  color: #444;
+}
+
+.terms-item strong {
+  font-weight: 600;
+  color: tomato; 
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .db-terms-container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .db-terms-container h1 {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+
+  .terms-section h2 {
+    font-size: 18px;
+  }
+
+  .terms-item p {
+    font-size: 14px;
+  }
+}

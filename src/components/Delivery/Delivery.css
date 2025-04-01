@@ -1,0 +1,39 @@
+/* Delivery.css */
+.delivery-process {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 0; /* Increased padding for better spacing */
+}
+
+.delivery-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.step-icon {
+  width: 80px; /* Increased from 60px to 80px */
+  height: 80px; /* Increased from 60px to 80px */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px; /* Increased from 10px to 15px for better spacing */
+}
+
+.step-icon span {
+  font-size: 40px; /* Increased from 30px to 40px */
+}
+
+.delivery-step p {
+  margin: 0;
+  font-size: 20px; /* Increased from 16px to 20px */
+  font-weight: 500;
+}
+
+.delivery-arrow {
+  font-size: 32px; /* Increased from 24px to 32px */
+  color: #888;
+}
