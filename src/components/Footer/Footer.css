@@ -9,6 +9,10 @@
   padding-top: 80px;
   margin-top: 100px;
 }
+.logo{
+  width: 150px;
+  height: 70px;
+}
 .footer-content{
   width: 100%;
   display: grid;
