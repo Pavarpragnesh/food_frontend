@@ -1,0 +1,101 @@
+.offer-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: url('../../assets/frontend_assets/offer.jpg') no-repeat center center;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 15px;
+}
+
+.offer-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 2rem; 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  letter-spacing: 1px; 
+  position: relative; 
+  padding: 10px 0; 
+  background: linear-gradient(45deg, #ddc90e, #f0f0f0); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+.offer-card {
+  background: url('../../assets/frontend_assets/offerbg1.jpeg') no-repeat center center;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin: 0 10px;
+  padding: 20px;
+  position: relative;
+  min-height: 200px;
+  background-size: cover; /* Ensure the background image covers the card */
+}
+
+.offer-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.offer-header h3 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+}
+
+.offer-code {
+  font-size: 16px;
+  color: #7f8c8d;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between code and copy button */
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #2980b9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: color 0.3s;
+}
+
+.copy-btn:hover {
+  color: #3498db;
+}
+
+.offer-details p {
+  margin: 8px 0;
+  color: #34495e;
+  font-size: 0.9em;
+}
+
+.offer-actions {
+  margin-top: 20px;
+  text-align: right;
+}
+
+/* Slider customization */
+.slick-slide {
+  padding: 0 10px;
+}
+
+.slick-dots {
+  bottom: -25px;
+}
+
+.slick-dots li button:before {
+  color: tomato;
+}
+
+.slick-dots li.slick-active button:before {
+  color: tomato;
+}

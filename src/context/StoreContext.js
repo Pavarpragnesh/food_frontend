@@ -11,6 +11,7 @@ const StoreContextProvider = (props) => {
   const [food_list, setFoodList] = useState([]);
   const [user, setUser] = useState(null);
   const [topDishes, setTopDishes] = useState([]); // New state for top dishes
+  const [offers, setOffers] = useState([]);
 
   const fetchCategories = async () => {
     try {
@@ -117,6 +118,30 @@ const StoreContextProvider = (props) => {
     }
   };
 
+  const fetchOffers = async () => {
+    try {
+      const response = await axios.get(`${url}/api/offer/list`);
+      if (response.data.success) {
+        setOffers(response.data.data);
+      } else {
+        console.error("Failed to fetch offers:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching offers:", error);
+    }
+  };
+  
+  useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([fetchCategories(), fetchFoodList(), fetchOffers()]);
+      const savedToken = localStorage.getItem("token");
+      if (savedToken) {
+        setToken(savedToken);
+      }
+    };
+    loadData();
+  }, []);
+
   const loadCartData = async (token) => {
     try {
       const response = await axios.post(
@@ -170,6 +195,8 @@ const StoreContextProvider = (props) => {
     user,
     setUser,
     topDishes, // Add topDishes to context
+    offers,
+    fetchOffers
   };
 
   return (
