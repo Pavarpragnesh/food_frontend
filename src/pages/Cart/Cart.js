@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
-  const { cartItems, food_list, removeFromCart, addToCart, getTotalCartAmount, url } = useContext(StoreContext);
+  const { cartItems, food_list, removeFromCart, addToCart, getTotalCartAmount, url, offers, promoCode, setPromoCode, promoError, setPromoError, discount, setDiscount } = useContext(StoreContext);
   const navigate = useNavigate();
 
   // Calculate delivery fee based on subtotal
@@ -18,6 +18,23 @@ const Cart = () => {
   };
   const deliveryFee = calculateDeliveryFee(subtotal);
   const isOrderBelowMinimum = subtotal > 0 && subtotal < 100;
+
+  const handlePromoSubmit = (e) => {
+    e.preventDefault();
+    const matchedOffer = offers.find(offer => offer.code.toLowerCase() === promoCode.toLowerCase());
+    if (matchedOffer) {
+      setPromoError("");
+      const discountAmount = matchedOffer.discountType === 'percentage' 
+        ? (subtotal * matchedOffer.discountValue) / 100 
+        : Math.min(matchedOffer.discountValue, subtotal);
+      setDiscount(discountAmount);
+    } else {
+      setPromoError("Invalid promo code");
+      setDiscount(0);
+    }
+  };
+
+  const totalAfterDiscount = subtotal + deliveryFee - discount;
 
   return (
     <div className="cart">
@@ -69,9 +86,16 @@ const Cart = () => {
               <p>₹{deliveryFee}</p>
             </div>
             <hr />
+            {discount > 0 && (
+              <div className="cart-total-details">
+                <p>Discount</p>
+                <p>-₹{discount}</p>
+              </div>
+            )}
+            <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>₹{subtotal + deliveryFee}</b>
+              <b>₹{totalAfterDiscount}</b>
             </div>
           </div>
           {isOrderBelowMinimum && (
@@ -85,11 +109,17 @@ const Cart = () => {
           </button>
         </div>
         <div className="cart-promocode">
-          {/* <p>If you have a promo code, enter it here</p>
-          <div className="cart-promocode-input">
-            <input type="text" placeholder="Promo code" />
-            <button>Submit</button>
-          </div> */}
+          <p>If you have a promo code, enter it here</p>
+          <form onSubmit={handlePromoSubmit} className="cart-promocode-input">
+            <input 
+              type="text" 
+              placeholder="Promo code" 
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+            />
+            <button type="submit">Submit</button>
+          </form>
+          {promoError && <p style={{ color: "red", marginTop: "10px" }}>{promoError}</p>}
         </div>
       </div>
     </div>

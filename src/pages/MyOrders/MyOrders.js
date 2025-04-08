@@ -268,7 +268,7 @@ const MyOrders = () => {
                     : `${item.name} X ${item.quantity}, `
                 )}
               </p>
-              <p>₹{order.amount}.00</p>
+              <p>₹{order.amount}</p>
               <p>Items: {order.items.length}</p>
               <p>
                 <b className={getStatusClass(order.status)}>{order.status}</b>

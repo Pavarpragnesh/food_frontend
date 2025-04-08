@@ -18,19 +18,39 @@ const PlaceOrder = () => {
     phone: "",
   });
 
-  const { getTotalCartAmount, food_list, cartItems, url, token } = useContext(StoreContext);
+  const { getTotalCartAmount, food_list, cartItems, url, token, offers, promoCode, setPromoCode, promoError, setPromoError, discount, setDiscount } = useContext(StoreContext);
   const navigate = useNavigate();
 
   // Calculate delivery fee based on subtotal
   const subtotal = getTotalCartAmount();
   const calculateDeliveryFee = (subtotal) => {
-    if (subtotal < 100) return 0; // Should not reach here due to navigation check
+    if (subtotal === 0 || subtotal < 100) return 0; // No delivery fee if cart is empty or below minimum
     if (subtotal >= 100 && subtotal < 300) return 50;
     if (subtotal >= 300 && subtotal <= 500) return 70;
     if (subtotal > 500) return 0;
     return 0; // Default case
   };
   const deliveryFee = calculateDeliveryFee(subtotal);
+  const isOrderBelowMinimum = subtotal > 0 && subtotal < 100;
+
+  // Handle promo code submission
+  const handlePromoSubmit = (e) => {
+    e.preventDefault();
+    const matchedOffer = offers.find(offer => offer.code.toLowerCase() === promoCode.toLowerCase());
+    if (matchedOffer) {
+      setPromoError("");
+      const discountAmount = matchedOffer.discountType === 'percentage' 
+        ? (subtotal * matchedOffer.discountValue) / 100 
+        : Math.min(matchedOffer.discountValue, subtotal);
+      setDiscount(discountAmount);
+    } else {
+      setPromoError("Invalid promo code");
+      setDiscount(0);
+    }
+  };
+
+  // Calculate total after discount
+  const totalAfterDiscount = subtotal + deliveryFee - discount;
 
   useEffect(() => {
     if (!window.Razorpay) {
@@ -61,7 +81,7 @@ const PlaceOrder = () => {
   const placeOrder = async (event) => {
     event.preventDefault();
 
-    if (getTotalCartAmount() < 100) {
+    if (isOrderBelowMinimum) {
       alert("Minimum order amount is ₹100. Please add more items.");
       navigate('/cart');
       return;
@@ -84,7 +104,9 @@ const PlaceOrder = () => {
       userId,
       address: data,
       items: orderItems,
-      amount: getTotalCartAmount() + deliveryFee, // Updated to use dynamic delivery fee
+      amount: totalAfterDiscount,
+      deliveryFee: deliveryFee,
+      discount:discount
     };
 
     try {
@@ -102,7 +124,7 @@ const PlaceOrder = () => {
 
         const options = {
           key,
-          amount,
+          amount: totalAfterDiscount * 100, // Convert to paise for Razorpay
           currency: "INR",
           name: "pragnesh",
           description: "Order Payment",
@@ -145,7 +167,7 @@ const PlaceOrder = () => {
   };
 
   useEffect(() => {
-    if (!token || getTotalCartAmount() === 0 || getTotalCartAmount() < 100) {
+    if (!token || getTotalCartAmount() === 0) {
       navigate('/cart');
     }
   }, [token, navigate]);
@@ -184,13 +206,38 @@ const PlaceOrder = () => {
               <p>₹{deliveryFee}</p>
             </div>
             <hr />
+            {discount > 0 && (
+              <div className="cart-total-details">
+                <p>Discount</p>
+                <p>-₹{discount}</p>
+              </div>
+            )}
+            <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>₹{subtotal + deliveryFee}</b>
+              <b>₹{totalAfterDiscount}</b>
             </div>
           </div>
-          <button type="submit">PROCEED TO PAYMENT</button>
+          {isOrderBelowMinimum && (
+            <p style={{ color: "red" }}>Minimum order amount is ₹100</p>
+          )}
+          <button type="submit" disabled={isOrderBelowMinimum}>
+            PROCEED TO PAYMENT
+          </button>
         </div>
+        {/* <div className="cart-promocode">
+          <p>If you have a promo code, enter it here</p>
+          <form onSubmit={handlePromoSubmit} className="cart-promocode-input">
+            <input 
+              type="text" 
+              placeholder="Promo code" 
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+            />
+            <button type="submit">Submit</button>
+          </form>
+          {promoError && <p style={{ color: "red", marginTop: "10px" }}>{promoError}</p>}
+        </div> */}
       </div>
     </form>
   );

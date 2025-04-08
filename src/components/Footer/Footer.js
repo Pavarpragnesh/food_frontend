@@ -77,7 +77,7 @@ const Footer = () => {
       </div>
       <hr />
       <p className="footer-copyright">
-        copyright 2024 © pavar.com - All Right Reserved.
+        copyright 2025 © pavar.com - All Right Reserved.
       </p>
 
       {/* Terms Modal */}

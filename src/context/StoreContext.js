@@ -12,6 +12,9 @@ const StoreContextProvider = (props) => {
   const [user, setUser] = useState(null);
   const [topDishes, setTopDishes] = useState([]); // New state for top dishes
   const [offers, setOffers] = useState([]);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoError, setPromoError] = useState("");
+  const [discount, setDiscount] = useState(0);
 
   const fetchCategories = async () => {
     try {
@@ -98,7 +101,6 @@ const StoreContextProvider = (props) => {
     try {
       const response = await axios.get(`${url}/api/order/top-ordered-dishes`);
       if (response.data.success) {
-        // Enrich top dishes with additional details from food_list
         const enrichedDishes = response.data.data.map((dish) => {
           const foodItem = food_list.find((food) => food._id === dish._id);
           return {
@@ -130,7 +132,7 @@ const StoreContextProvider = (props) => {
       console.error("Error fetching offers:", error);
     }
   };
-  
+
   useEffect(() => {
     const loadData = async () => {
       await Promise.all([fetchCategories(), fetchFoodList(), fetchOffers()]);
@@ -176,7 +178,6 @@ const StoreContextProvider = (props) => {
     }
   }, [token]);
 
-  // Fetch top dishes whenever food_list changes (to ensure we have the latest data to enrich top dishes)
   useEffect(() => {
     fetchTopDishes();
   }, [food_list]);
@@ -194,9 +195,15 @@ const StoreContextProvider = (props) => {
     setToken,
     user,
     setUser,
-    topDishes, // Add topDishes to context
+    topDishes,
     offers,
-    fetchOffers
+    fetchOffers,
+    promoCode,
+    setPromoCode,
+    promoError,
+    setPromoError,
+    discount,
+    setDiscount,
   };
 
   return (
