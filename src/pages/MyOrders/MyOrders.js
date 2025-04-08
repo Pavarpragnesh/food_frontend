@@ -116,58 +116,58 @@ const MyOrders = () => {
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 15;
     let yPosition = 15;
-  
+
     // Title: Order Receipt
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text("Order Receipt", pageWidth / 2, yPosition, { align: "center" });
     yPosition += 10;
-  
+
     // Draw a line under the title
     doc.setLineWidth(0.5);
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
     yPosition += 10;
-  
+
     // Order Details
     doc.setFontSize(12);
-  
+
     doc.setFont("helvetica", "bold");
     doc.text("Order ID:", margin, yPosition);
     doc.setFont("helvetica", "normal");
     doc.text(`${order._id}`, margin + 30, yPosition);
     yPosition += 7;
-  
+
     doc.setFont("helvetica", "bold");
     doc.text("Name:", margin, yPosition);
     doc.setFont("helvetica", "normal");
     doc.text(`${order.address.firstName} ${order.address.lastName}`, margin + 30, yPosition);
     yPosition += 7;
-  
+
     doc.setFont("helvetica", "bold");
     doc.text("Phone:", margin, yPosition);
     doc.setFont("helvetica", "normal");
     doc.text(`${order.address.phone}`, margin + 30, yPosition);
     yPosition += 7;
-  
+
     doc.setFont("helvetica", "bold");
     doc.text("Address:", margin, yPosition);
     doc.setFont("helvetica", "normal");
     doc.text(`${order.address.street}, ${order.address.city}, ${order.address.state}, ${order.address.Zipcode}`, margin + 30, yPosition);
     yPosition += 7;
-  
+
     doc.setFont("helvetica", "bold");
     doc.text("Date:", margin, yPosition);
     doc.setFont("helvetica", "normal");
     doc.text(`${new Date(order.date).toLocaleString()}`, margin + 30, yPosition);
     yPosition += 10;
-  
+
     // Table Header
     const tableStartY = yPosition;
     const col1X = margin;
     const col2X = margin + 80;
     const col3X = margin + 100;
     const col4X = margin + 120;
-  
+
     doc.setFont("helvetica", "bold");
     doc.setFillColor(200, 200, 200); // Light gray background for header
     doc.rect(margin, yPosition, pageWidth - 2 * margin, 8, "F"); // Background for header row
@@ -176,78 +176,77 @@ const MyOrders = () => {
     doc.text("Price", col3X, yPosition + 6);
     doc.text("Amount", col4X, yPosition + 6);
     yPosition += 8;
-  
+
     // Draw table borders
     doc.setLineWidth(0.2);
     doc.line(margin, tableStartY, pageWidth - margin, tableStartY); // Top border
     doc.line(margin, tableStartY, margin, yPosition); // Left border
     doc.line(pageWidth - margin, tableStartY, pageWidth - margin, yPosition); // Right border
     doc.line(margin, yPosition, pageWidth - margin, yPosition); // Bottom border after header
-  
+
     // Table Content
     doc.setFont("helvetica", "normal");
     let totalItems = 0;
     let subtotal = 0;
-  
+
     order.items.forEach((item, index) => {
       const amount = item.price * item.quantity;
       subtotal += amount;
       totalItems += item.quantity;
-  
+
       // Background color for alternate rows
       if (index % 2 === 0) {
         doc.setFillColor(240, 240, 240); // Very light gray for alternate rows
         doc.rect(margin, yPosition, pageWidth - 2 * margin, 8, "F");
       }
-  
+
       doc.text(item.name, col1X, yPosition + 6);
       doc.text(item.quantity.toString(), col2X, yPosition + 6);
       doc.text(`${item.price.toFixed(2)}`, col3X, yPosition + 6);
       doc.text(`${amount.toFixed(2)}`, col4X, yPosition + 6);
       yPosition += 8;
-  
+
       // Draw horizontal line for each row
       doc.line(margin, yPosition, pageWidth - margin, yPosition);
     });
-  
+
     // Draw vertical lines for table columns
     doc.line(col2X - 5, tableStartY, col2X - 5, yPosition); // Between Item and Qty
     doc.line(col3X - 5, tableStartY, col3X - 5, yPosition); // Between Qty and Price
     doc.line(col4X - 5, tableStartY, col4X - 5, yPosition); // Between Price and Amount
-  
-    // Calculate Delivery Charge based on subtotal
-    let deliveryCharge = 0;
-    if (subtotal >= 100 && subtotal < 300) {
-      deliveryCharge = 50;
-    } else if (subtotal >= 300 && subtotal < 500) {
-      deliveryCharge = 70;
-    } else if (subtotal >= 500) {
-      deliveryCharge = 0; // Free delivery
-    }
-  
+
+    // Use deliveryCharge and discount from the order object
+    const deliveryCharge = order.deliveryCharge || 0;
+    const discount = order.discount || 0;
+
     // Calculate Grand Total
-    const grandTotal = subtotal + deliveryCharge;
-  
+    const grandTotal = subtotal + deliveryCharge - discount;
+
     // Summary
     yPosition += 10;
     doc.setFont("helvetica", "normal");
     doc.text(`Total Qty: ${totalItems}`, margin, yPosition);
+    doc.setFont("helvetica", "bold");
     doc.text(`Sub Total: ${subtotal.toFixed(2)}`, col4X - 20, yPosition);
     yPosition += 7;
+    doc.setFont("helvetica", "normal");
     doc.text(`Delivery Charge: ${deliveryCharge.toFixed(2)}`, col4X - 20, yPosition);
+    yPosition += 7;
+    doc.setFont("helvetica", "normal");
+    doc.text(`Discount: -${discount.toFixed(2)}`, col4X - 20, yPosition); // Display as negative
     yPosition += 7;
     doc.setFont("helvetica", "bold");
     doc.text(`Grand Total: ${grandTotal.toFixed(2)}`, col4X - 20, yPosition);
     yPosition += 7;
     doc.setFont("helvetica", "normal");
-    doc.text(`Paid via: ${order.paymentMethod || "Online"}`, margin, yPosition);
-  
+    doc.text(`Paid via: ${order.payment ? "Online" : "Pending"}`, margin, yPosition);
+
     // Footer: Thank You Message
     yPosition = pageHeight - 20;
     doc.setFontSize(10);
     doc.setFont("helvetica", "italic");
     doc.text("Thank you for your order!", pageWidth / 2, yPosition, { align: "center" });
-  
+
     // Download the PDF
     doc.save(`Order_${order._id}.pdf`);
   };
@@ -268,7 +267,7 @@ const MyOrders = () => {
                     : `${item.name} X ${item.quantity}, `
                 )}
               </p>
-              <p>₹{order.amount}</p>
+              <p>₹{order.amount.toFixed(2)}</p>
               <p>Items: {order.items.length}</p>
               <p>
                 <b className={getStatusClass(order.status)}>{order.status}</b>

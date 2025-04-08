@@ -80,48 +80,48 @@ const PlaceOrder = () => {
 
   const placeOrder = async (event) => {
     event.preventDefault();
-
+  
     if (isOrderBelowMinimum) {
       alert("Minimum order amount is ₹100. Please add more items.");
       navigate('/cart');
       return;
     }
-
+  
     const userId = getUserIdFromToken(token);
     if (!userId) {
       alert("Session expired. Please log in again.");
       return;
     }
-
+  
     let orderItems = food_list
       .filter((item) => cartItems[item._id] > 0)
       .map((item) => ({
         ...item,
         quantity: cartItems[item._id],
       }));
-
+  
     let orderData = {
       userId,
       address: data,
       items: orderItems,
       amount: totalAfterDiscount,
       deliveryFee: deliveryFee,
-      discount:discount
+      discount: discount, // Ensure discount is sent
     };
-
+  
     try {
       const response = await axios.post(`${url}/api/order/place`, orderData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (response.data.success) {
         const { success_url, cancel_url, key, amount, userId } = response.data;
-
+  
         if (!window.Razorpay) {
           alert("Payment gateway is not available. Please refresh the page.");
           return;
         }
-
+  
         const options = {
           key,
           amount: totalAfterDiscount * 100, // Convert to paise for Razorpay
@@ -146,16 +146,16 @@ const PlaceOrder = () => {
             },
           },
         };
-
+  
         const rzp = new window.Razorpay(options);
-
+  
         rzp.on("payment.failed", function (response) {
           alert(
             `Payment failed!\nReason: ${response.error.description}\nPayment ID: ${response.error.metadata.payment_id}`
           );
           window.location.href = cancel_url;
         });
-
+  
         rzp.open();
       } else {
         alert("Payment failed");
