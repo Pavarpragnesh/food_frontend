@@ -1,5 +1,8 @@
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode"; // Use named import
+import { toast } from "react-toastify"; // Import toast for notifications
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export const StoreContext = createContext(null);
 
@@ -10,11 +13,12 @@ const StoreContextProvider = (props) => {
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
   const [user, setUser] = useState(null);
-  const [topDishes, setTopDishes] = useState([]); // New state for top dishes
+  const [topDishes, setTopDishes] = useState([]);
   const [offers, setOffers] = useState([]);
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState("");
   const [discount, setDiscount] = useState(0);
+  const navigate = useNavigate(); // Initialize navigate
 
   const fetchCategories = async () => {
     try {
@@ -182,6 +186,40 @@ const StoreContextProvider = (props) => {
     fetchTopDishes();
   }, [food_list]);
 
+  // Function to check if token is expired
+  const isTokenExpired = (token) => {
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000; // Current time in seconds
+      return decodedToken.exp < currentTime; // Compare with expiration time
+    } catch (error) {
+      return true; // If token is invalid, consider it expired
+    }
+  };
+
+  // Handle token expiration
+  const handleTokenExpiration = () => {
+    if (token && isTokenExpired(token)) {
+      toast.error("Token expired"); // Show toast message
+      localStorage.removeItem("token");
+      setToken("");
+      setUser(null);
+      setCartItems({});
+      navigate("/"); // Navigate to the specified URL
+    }
+  };
+
+  // Check token expiration periodically (e.g., every 30 seconds)
+  useEffect(() => {
+    if (token) {
+      const interval = setInterval(() => {
+        handleTokenExpiration();
+      }, 30000); // Check every 30 seconds
+
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, [token, navigate]);
+
   const contextValue = {
     categories,
     food_list,
@@ -204,6 +242,7 @@ const StoreContextProvider = (props) => {
     setPromoError,
     discount,
     setDiscount,
+    handleTokenExpiration, // Add this to context
   };
 
   return (

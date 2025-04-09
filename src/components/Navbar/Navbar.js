@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext,useState, useEffect } from "react";
 import "./Navbar.css";
 import { assets } from "../../assets/frontend_assets/assets";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import { StoreContext } from "../../context/StoreContext";
 
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
-  const { getTotalCartAmount, token, setToken, user, url } =
+  const { getTotalCartAmount, token, setToken, user, url, handleTokenExpiration } =
     useContext(StoreContext);
   const navigate = useNavigate();
 
@@ -15,6 +15,13 @@ const Navbar = ({ setShowLogin }) => {
     setToken("");
     navigate("/");
   };
+
+  // Check token expiration on mount and when token changes
+  useEffect(() => {
+    if (token) {
+      handleTokenExpiration(); // Check if token is expired
+    }
+  }, [token, handleTokenExpiration]);
 
   return (
     <div className="navbar">
