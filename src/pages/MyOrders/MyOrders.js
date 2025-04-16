@@ -11,6 +11,8 @@ const MyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [itemRatings, setItemRatings] = useState({});
   const [isRated, setIsRated] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 5; // Show 5 orders per page
 
   const fetchOrders = async () => {
     try {
@@ -251,11 +253,21 @@ const MyOrders = () => {
     doc.save(`Order_${order._id}.pdf`);
   };
 
+  // Pagination Logic
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = data.slice().reverse().slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(data.length / ordersPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="my-orders">
       <h2>My Orders</h2>
       <div className="container">
-        {data.slice().reverse().map((order, index) => {
+        {currentOrders.map((order, index) => {
           const isDelivered = order.status.toLowerCase() === 'delivered';
           return (
             <div key={index} className="my-orders-order">
@@ -283,6 +295,31 @@ const MyOrders = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="pagination">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => handlePageChange(i + 1)}
+            className={currentPage === i + 1 ? 'active' : ''}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
 
       {/* Rating Popup */}
